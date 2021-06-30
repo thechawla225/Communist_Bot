@@ -1,9 +1,11 @@
+from flask import Flask, request
 from telegram.ext import *
 import responses as R
 import telegram
 from telegram import *
 import time
 
+app = Flask(__name__)
 
 global bot
 global TOKEN
@@ -80,7 +82,22 @@ def error(update, context):
     print(f"Update {update} caused error {context.error}")
 
 
+@app.route('/setwebhook', methods=['GET', 'POST'])
+def set_webhook():
+    s = bot.setWebhook('{URL}{HOOK}'.format(URL=URL, HOOK=TOKEN))
+    if s:
+        return "webhook setup ok"
+    else:
+        return "webhook setup failed"
+
+
+@app.route('/')
+def index():
+    return '.'
+
+
 def main():
+    print("main called")
     updater = Updater(TOKEN, use_context=True)
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
@@ -93,4 +110,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    app.run(threaded=True)
